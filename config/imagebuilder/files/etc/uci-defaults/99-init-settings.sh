@@ -78,10 +78,6 @@ sed -i -e '/413c:81d7/,+5d' /etc/usb-mode.json
 # Remove Thales MV31-W T99W175 usb-modeswitch
 sed -i -e '/1e2d:00b3/,+5d' /etc/usb-mode.json
 
-# Disable /etc/config/xmm-modem
-uci set xmm-modem.@xmm-modem[0].enable='0'
-uci commit
-
 # setup misc settings
 sed -i 's/\[ -f \/etc\/banner \] && cat \/etc\/banner/#&/' /etc/profile
 sed -i 's/\[ -n "$FAILSAFE" \] && cat \/etc\/banner.failsafe/#&/' /etc/profile
