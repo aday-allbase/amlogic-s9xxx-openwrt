@@ -233,7 +233,6 @@ jobs:
 
     steps:
       - name: Initialization environment
-        name: Initialization Environment
         run: |
           sudo apt-get -qq update
           sudo apt-get -qq install build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync wget unzip qemu-utils mkisofs
