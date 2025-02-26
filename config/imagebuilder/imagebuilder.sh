@@ -79,7 +79,6 @@ adjust_settings() {
     
 # Configure partition sizes
 configure_partitions() {
-    log "INFO" "Configuring partition sizes"
     # Set kernel and rootfs partition sizes
     sed -i "s/CONFIG_TARGET_KERNEL_PARTSIZE=.*/CONFIG_TARGET_KERNEL_PARTSIZE=128/" .config
     sed -i "s/CONFIG_TARGET_ROOTFS_PARTSIZE=.*/CONFIG_TARGET_ROOTFS_PARTSIZE=1024/" .config
