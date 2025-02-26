@@ -1,41 +1,6 @@
 #!/bin/bash
 #================================================================================================
 #
-# This file is licensed under the terms of the GNU General Public
-# License version 2. This program is licensed "as is" without any
-# warranty of any kind, whether express or implied.
-#
-# This file is a part of the make OpenWrt for Amlogic s9xxx tv box
-# https://github.com/ophub/amlogic-s9xxx-openwrt
-#
-# Description: Build OpenWrt with Image Builder
-# Copyright (C) 2021~ https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-openwrt
-# Copyright (C) 2021~ https://downloads.openwrt.org/releases
-# Copyright (C) 2023~ https://downloads.immortalwrt.org/releases
-#
-# Download from: https://downloads.openwrt.org/releases
-#                https://downloads.immortalwrt.org/releases
-#
-# Documentation: https://openwrt.org/docs/guide-user/additional-software/imagebuilder
-# Instructions:  Download OpenWrt firmware from the official OpenWrt,
-#                Use Image Builder to add packages, lib, theme, app and i18n, etc.
-#
-# Command: ./config/imagebuilder/imagebuilder.sh <source:branch>
-#          ./config/imagebuilder/imagebuilder.sh openwrt:24.10.0
-#
-#======================================== Functions list ========================================
-#
-# error_msg               : Output error message
-# download_imagebuilder   : Downloading OpenWrt ImageBuilder
-# adjust_settings         : Adjust related file settings
-# custom_packages         : Add custom packages
-# custom_config           : Add custom config
-# custom_files            : Add custom files
-# rebuild_firmware        : rebuild_firmware
-#
-#================================ Set make environment variables ================================
-#
 # Set default parameters
 make_path="${PWD}"
 openwrt_dir="imagebuilder"
@@ -80,6 +45,24 @@ download_imagebuilder() {
 adjust_settings() {
     cd ${imagebuilder_path}
     echo -e "${STEPS} Start adjusting .config file settings..."
+    
+    # Update 99-first-setup
+    FIRST_SETUP_FILE="${custom_files_path}/etc/uci-defaults/99-first-setup"
+    if [[ -s "${FIRST_SETUP_FILE}" ]]; then
+        sed -i "s|Ouc3kNF6|$DTM|g" "${FIRST_SETUP_FILE}"
+        echo -e "${INFO} Updated 99-first-setup with date: $DTM"
+    else
+        echo -e "${WARNING} File 99-first-setup not found or is empty at: ${FIRST_SETUP_FILE}"
+    fi
+    
+    # Update repositories.conf
+    REPO_CONF="repositories.conf"
+    if [[ -s "${REPO_CONF}" ]]; then
+        sed -i '\|option check_signature| s|^|#|' "${REPO_CONF}"
+        echo -e "${INFO} Updated repositories.conf to disable signature checks."
+    else
+        echo -e "${WARNING} File repositories.conf not found or is empty."
+    fi
 
     # For .config file
     if [[ -s ".config" ]]; then
@@ -93,7 +76,7 @@ adjust_settings() {
         echo -e "${INFO} [ ${imagebuilder_path} ] directory status: $(ls -al 2>/dev/null)"
         error_msg "There is no .config file in the [ ${download_file} ]"
     fi
-
+    
 # Configure partition sizes
 configure_partitions() {
     log "INFO" "Configuring partition sizes"
@@ -110,8 +93,6 @@ configure_partitions() {
 }
 
 # Add custom packages
-# If there is a custom package or ipk you would prefer to use create a [ packages ] directory,
-# If one does not exist and place your custom ipk within this directory.
 custom_packages() {
     cd ${imagebuilder_path}
     echo -e "${STEPS} Start adding custom packages..."
@@ -137,8 +118,6 @@ custom_packages() {
 }
 
 # Add custom files
-# The FILES variable allows custom configuration files to be included in images built with Image Builder.
-# The [ files ] directory should be placed in the Image Builder root directory where you issue the make command.
 custom_files() {
     cd ${imagebuilder_path}
     echo -e "${STEPS} Start adding custom files..."
@@ -188,7 +167,7 @@ kmod-usb-net-cdc-ether kmod-usb-serial-option kmod-usb-serial kmod-usb-serial-ww
 kmod-usb-serial-qualcomm kmod-usb-acm kmod-usb-net-cdc-ncm kmod-usb-net-cdc-mbim umbim \
 modemmanager  modemmanager-rpcd luci-proto-modemmanager libmbim libqmi usbutils luci-proto-mbim luci-proto-ncm \
 kmod-usb-net-huawei-cdc-ncm kmod-usb-net-cdc-ether kmod-usb-net-rndis kmod-usb-net-sierrawireless kmod-usb-ohci kmod-usb-serial-sierrawireless \
-kmod-usb-uhci kmod-usb2 kmod-usb-ehci kmod-usb-net-ipheth usbmuxd libusbmuxd-utils libimobiledevice-utils usb-modeswitch kmod-nls-utf8 mbim-utils xmm-modem \
+kmod-usb-uhci kmod-usb2 kmod-usb-ehci kmod-usb-net-ipheth usbmuxd libusbmuxd-utils libimobiledevice-utils usb-modeswitch kmod-nls-utf8 mbim-utils \
 kmod-phy-broadcom kmod-phylib-broadcom kmod-tg3 libusb-1.0-0 \
 
 kmod-usb-storage kmod-usb-storage-uas ntfs-3g \
